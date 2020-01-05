@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- tutorial from https://reactjs.org/tutorial/tutorial.html -->
+		<script type="application/typescript" id="app.tsx">
+			import * as React from 'react';
+			import * as ReactDOM from 'react-dom';
+			import Game from 'game';
+
+			ReactDOM.render(
+				<Game/>,
+				document.getElementById('root')
+			);
+		</script>
+		
+		<script type="application/typescript" id="square.tsx">
+			import * as React from 'react';
+			import * as ReactDOM from 'react-dom';
+			
+			export default function Square(props) {
+			  return (
+				<button className="square" onClick={props.onClick}>
+				  {props.value || '\u00a0'}
+				</button>
+			  );
+			}
+		</script>
+		
+		<script type="application/typescript" id="board.tsx">
+			import Square from 'square';
+			import * as React from 'react';
+			import * as ReactDOM from 'react-dom';
+			
+			
+			export default class Board extends React.Component {
+			  renderSquare(i) {
+				return (
+				  <Square
+					value={this.props.squares[i]}
+					onClick={() => this.props.onClick(i)}
+				  />
+				);
+			  }
+
+			  render() {
+				return (
+				  <div>
+					<div className="board-row">
+					  {this.renderSquare(0)}
+					  {this.renderSquare(1)}
+					  {this.renderSquare(2)}
+					</div>
+					<div className="board-row">
+					  {this.renderSquare(3)}
+					  {this.renderSquare(4)}
+					  {this.renderSquare(5)}
+					</div>
+					<div className="board-row">
+					  {this.renderSquare(6)}
+					  {this.renderSquare(7)}
+					  {this.renderSquare(8)}
+					</div>
+				  </div>
+				);
+			  }
+			}
+		</script>
+	
+		<script type="application/typescript" id="game.tsx">
+			import Board from 'board';
+			import * as React from 'react';
+			import * as ReactDOM from 'react-dom';
+			
+		
+			function calculateWinner(squares) {
+			  const lines = [
+				[0, 1, 2],
+				[3, 4, 5],
+				[6, 7, 8],
+				[0, 3, 6],
+				[1, 4, 7],
+				[2, 5, 8],
+				[0, 4, 8],
+				[2, 4, 6],
+			  ];
+			  for (let i = 0; i < lines.length; i++) {
+				const [a, b, c] = lines[i];
+				if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+				  return squares[a];
+				}
+			  }
+			  return null;
+			}
+		
+			export default class Game extends React.Component {
+			  constructor(props) {
+				super(props);
+				this.state = {
+				  history: [{
+					squares: Array(9).fill(null),
+				  }],
+				  stepNumber: 0,
+				  xIsNext: true,
+				};
+			  }
+			  
+			  handleClick(i) {
+				const history = this.state.history.slice(0, this.state.stepNumber + 1);
+				const current = history[history.length - 1];
+				const squares = current.squares.slice();
+				if (calculateWinner(squares) || squares[i]) {
+				  return;
+				}
+				squares[i] = this.state.xIsNext ? 'X' : 'O';
+				this.setState({
+				  history: history.concat([{
+					squares: squares,
+				  }]),
+				  stepNumber: history.length,
+				  xIsNext: !this.state.xIsNext,
+				});
+			  }
+			  
+			  jumpTo(step) {
+				this.setState({
+				  stepNumber: step,
+				  xIsNext: (step % 2) === 0,
+				});
+			  }
+
+			  render() {
+				const history = this.state.history;
+				const current = history[this.state.stepNumber];
+				const winner = calculateWinner(current.squares);
+
+				const moves = history.map((step, move) => {
+				  const desc = move ?
+					'Go to move #' + move :
+					'Go to game start';
+				  return (
+					<li key={move}>
+					  <button onClick={() => this.jumpTo(move)}>{desc}</button>
+					</li>
+				  );
+				});
+
+				let status;
+				if (winner) {
+				  status = 'Winner: ' + winner;
+				} else {
+				  status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+				}
+
+				return (
+				  <div className="game">
+					<div className="game-board">
+					  <Board
+						squares={current.squares}
+						onClick={(i) => this.handleClick(i)}
+					  />
+					</div>
+					<div className="game-info">
+					  <div>{status}</div>
+					  <ol>{moves}</ol>
+					</div>
+				  </div>
+				);
+			  }
+			}
+		</script>
+	
+	
+	
+		<script type="lib/typescript" id="lib.dom.d.ts"                     src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.dom.d.ts"></script>
+		<script type="lib/typescript" id="lib.es5.d.ts"                     src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es5.d.ts"></script>
+		<script type="lib/typescript" id="lib.es6.d.ts"                     src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es6.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.d.ts"                  src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.d.ts"></script>
+		<script type="lib/typescript" id="lib.dom.iterable.d.ts"            src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.dom.iterable.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.core.d.ts"             src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.core.d.ts"></script>
+		<script type="lib/typescript" id="lib.scripthost.d.ts"              src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.scripthost.d.ts"></script>
+		<script type="lib/typescript" id="lib.webworker.importscripts.d.ts" src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.webworker.importscripts.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.collection.d.ts"       src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.collection.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.generator.d.ts"        src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.generator.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.iterable.d.ts"         src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.iterable.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.promise.d.ts"          src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.promise.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.proxy.d.ts"            src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.proxy.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.reflect.d.ts"          src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.reflect.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.symbol.d.ts"           src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.symbol.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.symbol.wellknown.d.ts" src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.symbol.wellknown.d.ts"></script>
+
+		<script type="react/typescript" id="react/index.d.ts"      src="https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/types/react/index.d.ts"></script>
+		<script type="react/typescript" id="react/global.d.ts"     src="https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/types/react/global.d.ts"></script>
+		<script type="react/typescript" id="react-dom/index.d.ts"  src="https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/types/react-dom/index.d.ts"></script>
+		<script type="react/typescript" id="prop-types/index.d.ts" src="https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/types/prop-types/index.d.ts"></script>
+		<script type="react/typescript" id="csstype/index.d.ts"    src="https://raw.githubusercontent.com/frenic/csstype/master/index.d.ts"></script>
+		
+		<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+		<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+		<script src="moduleShim.js"></script>
+
+		<script id="react">define._(React);</script>
+		<script id="react-dom">define._(ReactDOM);</script>
+		<script src="compile.js"></script>
+	</head>
+	
+	<body>
+		<div id="root"></div>
+		<script>
+			runTS((ts) => ({
+				target        : ts.ScriptTarget.ES2015,
+				//noEmitOnError : true,
+				allowJs       : true,
+				checkJs       : true,
+				baseUrl       : '/',
+				alwaysStrict  : true,
+				//strict        : true,
+				module        : ts.ModuleKind.AMD,
+				jsx           : ts.JsxEmit.React,
+				lib           : ['lib.es6.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts']
+			}));
+		</script>
+	</body>
+</html>

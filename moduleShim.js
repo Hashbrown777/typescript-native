@@ -85,4 +85,12 @@
 				done(false, `Module '${id}' failed to execute`);
 		}
 	};
+	
+	window.define._ = (exports) => {
+		let id = document.currentScript.id;
+		let module = getModule(id);
+		module.publish(exports);
+		delete module.publish;
+		delete module.error;
+	};
 })();

@@ -59,8 +59,16 @@ async function runTS(options, version = 'release-3.8', app = 'application') {
 			readFile                  : (fileName) => (sourceStrings.get(fileName)),
 			resolveModuleNames        : (moduleNames, containingFile) => (
 				moduleNames.map((fileName) => {
-					fileName = `${fileName}.ts`;
-					return (host.fileExists(fileName)) ? {resolvedFileName:fileName} : undefined;
+					if (host.fileExists(`${fileName}.ts`))
+						return {resolvedFileName:`${fileName}.ts`};
+					if (host.fileExists(`${fileName}.tsx`))
+						return {resolvedFileName:`${fileName}.tsx`};
+					if (host.fileExists(`${fileName}/index.d.ts`))
+						return {resolvedFileName:`${fileName}/index.d.ts`};
+					if (host.fileExists(`${fileName}/index.ts`))
+						return {resolvedFileName:`${fileName}/index.ts`};
+					if (host.fileExists(`${fileName}.d.ts`))
+						return {resolvedFileName:`${fileName}.d.ts`};
 				})
 			),
 			getSourceFile             : (fileName, languageVersion, onError) => {
