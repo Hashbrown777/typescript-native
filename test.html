@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="lib/typescript" id="lib.dom.d.ts"                     src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.dom.d.ts"></script>
+		<script type="lib/typescript" id="lib.es5.d.ts"                     src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es5.d.ts"></script>
+		<script type="lib/typescript" id="lib.es6.d.ts"                     src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es6.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.d.ts"                  src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.d.ts"></script>
+		<script type="lib/typescript" id="lib.dom.iterable.d.ts"            src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.dom.iterable.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.core.d.ts"             src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.core.d.ts"></script>
+		<script type="lib/typescript" id="lib.scripthost.d.ts"              src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.scripthost.d.ts"></script>
+		<script type="lib/typescript" id="lib.webworker.importscripts.d.ts" src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.webworker.importscripts.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.collection.d.ts"       src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.collection.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.generator.d.ts"        src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.generator.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.iterable.d.ts"         src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.iterable.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.promise.d.ts"          src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.promise.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.proxy.d.ts"            src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.proxy.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.reflect.d.ts"          src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.reflect.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.symbol.d.ts"           src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.symbol.d.ts"></script>
+		<script type="lib/typescript" id="lib.es2015.symbol.wellknown.d.ts" src="https://raw.githubusercontent.com/microsoft/TypeScript/release-3.8/lib/lib.es2015.symbol.wellknown.d.ts"></script>
+
+		<script type="application/typescript" id="2.ts">import {bob} from '1'; console.log(bob);</script>
+		<script type="application/typescript" id="1.ts">import * as e from '5'; export const bob :number = 7; console.log(e);</script>
+		<script type="application/typescript" id="0.ts">import {bob} from '1'; import {steve} from '3'; console.log(bob, steve);</script>
+		<script type="application/typescript" id="3.ts">import {bob} from '1'; export const steve :string = 'bob' + bob;</script>
+		<script type="application/typescript" id="5.ts">import * as bob from '0'; console.log(bob);</script>
+		
+		<script type="application/typescript" id="2a.ts">import {bob} from '1a'; console.log(bob);</script>
+		<script type="application/typescript" id="1a.ts">export const bob :number = 7;</script>
+		<script type="application/typescript" id="0a.ts">import {bob} from '1a'; import {steve} from '3a'; console.log(bob, steve);</script>
+		<script type="application/typescript" id="3a.ts">import {bob} from '1a'; export const steve :string = 'bob' + bob;</script>
+		
+		<script type="application/typescript" id="2b.ts">import {bob} from '1b'; console.log(bob);</script>
+		<script type="application/typescript" id="1b.ts">export const bob :number = 7;</script>
+		<script type="application/typescript" id="0b.ts">import {bob} from '1b'; import {steve} from '3b'; console.log(bob, steve);</script>
+		<script type="application/typescript" id="3b.ts">import {bob} from '1b'; export const steve :string = 'bob' + bob; throw 'woops';</script>
+		
+		<script src="moduleShim2.js"></script>
+		<script src="compile.js"></script>
+	</head>
+	
+	<body>
+		<script>
+			runTS((ts) => ({
+				target        : ts.ScriptTarget.ES2015,
+				noEmitOnError : true,
+				noImplicitAny : true,
+				allowJs       : true,
+				checkJs       : true,
+				baseUrl       : '/',
+				alwaysStrict  : true,
+				strict        : true,
+				module        : ts.ModuleKind.AMD,
+				lib           : ['lib.es6.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts']
+			}));
+		</script>
+	</body>
+</html>
