@@ -84,7 +84,7 @@ async function runTS(options, version = 'release-3.8', app = 'application') {
 			...ts.getPreEmitDiagnostics(program),
 			...emit.diagnostics
 		]) {
-				let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, host.getNewLine());
+			let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, host.getNewLine());
 			if (diagnostic.file) {
 				message = {message, ...diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)};
 				message = `${diagnostic.file.fileName} (${message.line + 1},${message.character + 1}): ${message.message}`;
