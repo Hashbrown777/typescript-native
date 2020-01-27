@@ -196,11 +196,11 @@
 		
 		<script src="resources/unpkg/react@16.12.0/umd/react.production.min.js"></script>
 		<script src="resources/unpkg/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
-		<script src="../moduleShim.js"></script>
 
+		<script src="../compile.js"></script>
+		<script src="../moduleShim.js" data-log=""></script>
 		<script id="react">define([], () => (React));</script>
 		<script id="react-dom">define([], () => (ReactDOM));</script>
-		<script src="../compile.js"></script>
 	</head>
 	
 	<body>
@@ -208,18 +208,14 @@
 		<script type="module">(async () => {
 			let compiler = new TypeScript({compiler:'resources/microsoft/TypeScript/release-3.8/lib/typescriptServices.js'});
 			let ts = await compiler.ts;
-			compiler.compile({
-				target        : ts.ScriptTarget.ES2015,
-				//noEmitOnError : true,
-				allowJs       : true,
-				checkJs       : true,
-				baseUrl       : '/',
+			compiler.compile({options:{
+				target        : ts.ScriptTarget.ES2018,
 				alwaysStrict  : true,
-				//strict        : true,
+				strict        : true,
 				module        : ts.ModuleKind.AMD,
 				jsx           : ts.JsxEmit.React,
 				lib           : ['lib.es6.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts']
-			});
+			}});
 		})()</script>
 	</body>
 </html>

@@ -8,10 +8,14 @@ let require = ({require}) => (require);
 class Module {
 	static modules = new Map();
 	static get = (id) => {
+		id = TypeScript.normalisePath(id).replace(/\.(ts|tsx|js|d\.ts)$/, '');
+		if (!id)
+			throw 'Empty dependency';
 		if (!this.modules.get(id))
 			this.modules.set(id, new Module(id));
 	  	return this.modules.get(id);
 	};
+	static valid = (name) => (name != 'require' && name != 'exports');
 
 	constructor(id) {
 		this.id = id;
@@ -28,7 +32,18 @@ class Module {
 		let {publish, error} = this;
 		if (!publish)
 			throw `Module '${this.id}' is being registered twice`;
-		this.dependencies = dependencies.map(Module.get);
+		this.dependencies = dependencies
+			.filter(Module.valid)
+			.map((url) => {
+				if (!/^\//.test(url)) {
+					let folder = this.id.match(/^(.*\/)[^/]+$/);
+					if (folder)
+						url = folder[1] + TypeScript.normalisePath(url);
+				}
+				return url;
+			})
+			.map(Module.get)
+		;
 		delete this.publish;
 		delete this.error;
 		return {publish, error};
@@ -47,12 +62,19 @@ class Module {
 		circular(this);
 	}
 }
-	
-window.define = async ([x, y, ...dependencies], module) => {
-	let id = document.currentScript.id;
-	let container = Module.get(id);
-	let publish, error;
 
+let info = (document.currentScript.hasAttribute('data-log')) ?
+	console.info :
+	() => {}
+;
+	
+window.define = async (dependencies, module) => {
+	let container = (document.currentScript.id) ?
+		Module.get(document.currentScript.id) :
+		new Module('<anonymous>')
+	;
+
+	let publish, error;
 	//making sure nomatter how we were 'done' the state is recorded
 	let done = (good, result) => {
 		((good) ? publish : error)(result);
@@ -75,18 +97,35 @@ window.define = async ([x, y, ...dependencies], module) => {
 	await attempt(() => {
 		({publish, error} = container.init(dependencies));
 		container.circular();
-	}, `Error during setup for module '${id}'`);
+	}, `Error during setup for module '${container.id}'`);
 	
+	let imports;
 	await attempt(async () => {
-		if (dependencies.length)
-			console.info(`Module '${id}' waiting for ${container.dependencies.map(({done, id}) => (`'${id}'${(done) ? '*' : ''}`)).join(', ')}`);
-		dependencies = await Promise.all(container.dependencies.map(require));
-	}, `Module '${id}' has a broken dependency`);
+		if (container.dependencies.length)
+			info(`Module '${container.id}' waiting for ${container.dependencies.map(({done, id}) => (`'${id}'${(done) ? '*' : ''}`)).join(', ')}`);
+		imports = await Promise.all(container.dependencies.map(require));
+	}, `Module '${container.id}' has a broken dependency`);
 
+	let exports = {};
+	imports = dependencies.reduce(
+		({index, output}, val) => {
+			switch (val) {
+			case 'require':
+				output.push(null);
+				break;
+			case 'exports':
+				output.push(exports);
+				break;
+			default:
+				output.push(immute(imports[index++]));
+			}
+			return {index, output};
+		},
+		{index:0, output:[]}
+	).output;
 	await attempt(() => {
-		console.info(`Running module '${id}'`);
-		let exports = {};
+		info(`Running module '${container.id}'`);
 		//non-standard behaviour; returning an object becomes the export
-		done(true, module(null, exports, ...dependencies.map(immute)) || exports);
-	}, `Module '${id}' failed to execute`);
+		done(true, module(...imports) || exports);
+	}, `Module '${container.id}' failed to execute`);
 };

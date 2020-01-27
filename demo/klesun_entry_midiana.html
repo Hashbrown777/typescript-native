@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<!-- saved from url=https://klesun.github.io/entry/midiana/ -->
+<html>
+<head>
+    <meta charset="utf-8"/>
+<!--CHANGED-->
+	<script src="../moduleShim.js"></script>
+	<script src="../compile.js"></script>
+	<base href="https://klesun.github.io/entry/midiana/">
+<!--/CHANGED-->
+    <link rel="stylesheet" type="text/css" href="../common.css">
+</head>
+<body tabIndex="-1">
+
+<div id="composeCont">
+    <span id="playbackConfigDiv">
+        <label>Tempo: <input type="number" class="holder tempo" value="120" min="15" max="480"
+                      onchange="this.value = Math.min(Math.max(this.value, this.min), this.max);"/></label>
+        <label>Loop Start: <input type="number" class="holder loopStart float" value="0"/></label>
+        <label>Loop Times: <input type="number" class="holder loopTimes" value="0"/></label>
+        <label id="visualConfigDiv">
+            Tact Size: <input type="number" class="holder tactSize" value="1" min="0.25" max="16" step="0.25"
+                              onchange="this.value = Math.min(Math.max(this.value, this.min), this.max);"/>
+        </label>
+        <label>Key Signature: <input type="number" min="-7" max="7" value="0" class="holder keySignature"/></label>
+        <label>Synth: <select id="synthDropdown"></select></label>
+        <span id="synthControl"></span>
+        <br clear="all"/>
+        <canvas id="pianoCanvas" width="735px" height="45px" data-octaves="7" style="background-color: white;"></canvas>
+        <label title="Use the F4 or Insert, Luke">Input Notes:
+            <input type="checkbox" checked="checked" class="enableMidiInputFlag"/>
+        </label>
+        <label title="
+Use after setting playback volume on your device to zero.
+Designed for people who want to hear exactly how it will sound instantly.">Play On Key Down:
+            <input type="checkbox" class="enablePlayOnKeyDownFlag" checked="1"/>
+        </label>
+        <label title="
+Treats you PC keyboard as piano keyboard according to keys placement
+(Left Shift - C, Z - C#, X - D, C - D#, V - E, B - F ... and so on...)">Pseudo-Piano:
+            <input type="checkbox" checked="checked" class="enablePseudoPianoInputFlag"/>
+        </label>
+        <label title="Un-check it if you got performance problems with your song">Visualized Playback:
+            <input type="checkbox" checked="checked" class="enableVisualizedPlaybackFlag"/>
+        </label>
+    </span>
+
+    <div id="sheetMusicDiv" class="sheetMusicCont"></div>
+
+    <div style="display: flex;">
+        <div>
+            <div class="channelColors" title="notes you input will be in such color">
+                <label>Input Channel:</label>
+                <select class="inputChannelDropdown"></select>
+            </div>
+            <div id="presetListBlock"></div>
+            My Songs:
+            <ul class="my-song-links">
+                <li><a href="#">wait for async data</a></li>
+                <li><a href="#">wait for async data</a></li>
+                <li><a href="#">wait for async data</a></li>
+            </ul>
+        </div>
+        <div style="margin-left: 20px; margin-top: 10px; background-color: #f8f8f8;">
+            <div style="text-align: center">
+                <img class="pseudoPianoImg" src="../../imgs/pseudoPiano.png">
+            </div>
+            <div class="manualCont">
+                <div style="width: 400px">
+                    <table>
+                        <thead>
+                            <th>To</th><th>Press</th>
+                        </thead>
+                        <tbody>
+                            <tr><td>Play</td><td>Space</td></tr>
+                            <tr><td>Enter Chords</td><td>Keys On Your Midi Device</td></tr>
+                            <tr><td>Navigate</td><td>Arrow Keys / Home / End</td></tr>
+                            <tr><td>Save Song</td><td>Ctrl-S</td></tr>
+                            <tr><td>Open Song</td><td>Ctrl-O</td></tr>
+                            <tr><td>Save Song As .mid File</td><td>Ctrl-E</td></tr>
+                            <tr><td>Open .mid File</td><td>Ctrl-I</td></tr>
+                            <tr><td>Select Next Note</td><td>Shift</td></tr>
+                            <tr><td>Add Pause</td>
+                                <td>Pause Break <a class="comment">(Works Same As Adding Note From Midi Device)</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="manualCont" style="flex: 1">
+                    <table>
+                        <thead>
+                            <tr><th colspan="2">Change Note In Chord (If Not Selected - Change Whole Chord)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Increase Note Length Twice</td>
+                                <td>[ <a class="comment">(Opening Square Bracket)</a> <a class="or">or</a> + <a class="comment">(Num Pad Plus)</a></td></tr>
+                            <tr><td>Decrease Note Length Twice</td>
+                                <td>] <a class="comment">(Closing Square Bracket)</a> <a class="or">or</a> - <a class="comment">(Num Pad Minus)</a></td></tr>
+                            <tr><td>Put Dot / Undo Triplet</td>
+                                <td>. <a class="comment">(Generic Dot)</a> <a class="or">or</a> * <a class="comment">(Num Pad Asterisk)</a></td></tr>
+                            <tr><td>Remove Dot / Make Triplet</td>
+                                <td>, <a class="comment">(Generic Comma)</a> <a class="or">or</a> / <a class="comment">(Num Pad Slash)</a></td></tr>
+
+                            <tr><td>Delete Note</td><td>Delete / Backspace</td></tr>
+                            <tr><td>Change Note Channel (Use Preset Table To Assign Other Instruments Than Piano To Channel Numbers)</td>
+                                <td>Numbers 0..9 On Numpad</td></tr>
+                            <tr><td>Append New Note To Chord</td>
+                                <td>Key On Midi Device (Works When Any Note In Chord Is Selected)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br clear="all"/>
+            Note: may be outdated. For most recent key mapping see
+            <a href="https://github.com/klesun/shmidusic.lv/blob/master/src/compose/Handler.ts#LC177">
+                Handler.ts::focusedHandlers
+            </a>
+        </div>
+    </div>
+</div>
+
+<!--CHANGED-->
+<script type="application/typescript" src="./index.ts"></script>
+<script>define(['./index.ts'], (index) => {
+
+    const sfFluidUrl = 'https://dl.dropbox.com/s/dm2ocmb96nkl458/fluid.sf3?dl=0';
+    const whenSfBuffer = fetch(sfFluidUrl).then(rs => rs.arrayBuffer());
+
+    index.default({
+		rootDom: document.getElementById('composeCont'),
+		whenSfBuffer: whenSfBuffer,
+	});
+
+});</script>
+<!-- both of these styles will work
+<script>
+    const sfFluidUrl = 'https://dl.dropbox.com/s/dm2ocmb96nkl458/fluid.sf3?dl=0';
+    const whenSfBuffer = fetch(sfFluidUrl).then(rs => rs.arrayBuffer());
+
+    Module.get('./index.ts').require.then((index) => {
+		index.default({
+			rootDom: document.getElementById('composeCont'),
+			whenSfBuffer: whenSfBuffer,
+		})
+	});
+</script>-->
+
+<script type="module">(async () => {
+	let compiler = new TypeScript({compiler:'https://klesun-misc.github.io/TypeScript/lib/typescriptServices.js'});
+	let ts = await compiler.ts;
+	compiler.compile({
+		warning : () => {},
+		options : {
+			target  : ts.ScriptTarget.ES2018,
+			module  : ts.ModuleKind.AMD,
+			allowJs : true
+		}
+	});
+
+	setTimeout(() => { console.log(
+		//still waiting on some things?
+		Array.from(Module.modules.entries())
+			.map(([id, module]) => (module))
+			.filter(({done}) => (!done))
+			.reduce((output, {dependencies, id}) => {
+				if (output[id]) throw '';
+				output[id] = dependencies
+					.filter(({done}) => (!done))
+					.map(({id}) => (id))
+				;
+				return output;
+			}, {})
+		,
+		//complete (ran or broken)
+		Array.from(Module.modules.entries())
+			.map(([id, module]) => (module))
+			.filter(({done}) => (done))
+			.map(({id}) => (id))
+	); }, 5000);
+})()</script>
+<!--/CHANGED-->
+
+<style>
+    #synthControl { background-color: #f8f8ff; }
+    #synthControl div {
+        background-color: #e8e8ff;
+        margin: 4px;
+    }
+
+    .manualCont {
+        display: flex;
+        background-color: #f8fff8;
+    }
+    .manualCont table {
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+    .manualCont table th { background-color: #eef; }
+    .manualCont table td,th {
+        border: solid 1px green;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .manualCont table td:nth-child(odd) {
+        max-width: 275px;
+    }
+    .manualCont table td:nth-child(even) { font-weight: bold; }
+    .manualCont table td:nth-child(even) a.comment {
+        font-weight: normal;
+        color: #a00;
+    }
+    .manualCont table td:nth-child(even) a.or {
+        font-weight: normal;
+        color: #0a0;
+    }
+
+    body {
+        font-size: 12px;
+        font-family: monospace;
+    }
+    #playbackConfigDiv { background-color: #ddf; }
+    #playbackConfigDiv * { font-size: 10px; }
+    #playbackConfigDiv input[type="number"]:not(.float) {
+        width: 40px;
+    }
+    #sheetMusicDiv {
+        margin-top: 20px;
+        min-height: 120px;
+    }
+    input[type="number"] {
+        width: 60px;
+        margin-right: 15px;
+    }
+    span {
+        display: inline-block;
+    }
+    #sheetMusicDiv {
+        outline-color: #eee;
+    }
+
+    #presetListBlock {
+        margin: 2px;
+    }
+    #presetListBlock table { border-collapse: collapse; }
+    #presetListBlock td {
+        background-color: #f8f8f8;
+        font-size: 10px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        border: solid 1px #88f;
+    }
+    #presetListBlock input[type="checkbox"] {
+        margin:0;
+        margin-top: 1px;
+        margin-left: 1px;
+    }
+    #presetListBlock select {
+        height: 10px;
+        margin: 0px;
+        font-size: 10px;
+        padding: 0px;
+        border: none;
+    }
+
+    div.inlineBlock {
+        float: left;
+    }
+
+    ul {
+        max-width: 200px;
+        max-height: 400px;
+        overflow: scroll;
+        margin-top: 0px;
+        padding-left: 2px;
+    }
+</style>
+</body>
+</html>

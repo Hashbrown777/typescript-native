@@ -20,23 +20,26 @@
 
 		<script src="../filesystemHelper.js" data-root="../"></script>
 
+		<!-- this one fails to compile since it is cyclical-->
 		<script type="application/typescript" id="2.ts">import {bob} from '1'; console.log(bob);</script>
 		<script type="application/typescript" id="1.ts">import * as e from '5'; export const bob :number = 7; console.log(e);</script>
 		<script type="application/typescript" id="0.ts">import {bob} from '1'; import {steve} from '3'; console.log(bob, steve);</script>
 		<script type="application/typescript" id="3.ts">import {bob} from '1'; export const steve :string = 'bob' + bob;</script>
 		<script type="application/typescript" id="5.ts">import * as bob from '0'; console.log(bob);</script>
 		
+		<!-- this one runs fine -->
 		<script type="application/typescript" id="2a.ts">import {bob} from '1a'; console.log(bob);</script>
 		<script type="application/typescript" id="1a.ts">export const bob :number = 7;</script>
 		<script type="application/typescript" id="0a.ts">import {bob} from '1a'; import {steve} from '3a'; console.log(bob, steve);</script>
 		<script type="application/typescript" id="3a.ts">import {bob} from '1a'; export const steve :string = 'bob' + bob;</script>
 		
+		<!-- this one compiles but 3b throws so 0b reports that it hangs -->
 		<script type="application/typescript" id="2b.ts">import {bob} from '1b'; console.log(bob);</script>
 		<script type="application/typescript" id="1b.ts">export const bob :number = 7;</script>
 		<script type="application/typescript" id="0b.ts">import {bob} from '1b'; import {steve} from '3b'; console.log(bob, steve);</script>
 		<script type="application/typescript" id="3b.ts">import {bob} from '1b'; export const steve :string = 'bob' + bob; throw 'woops';</script>
 		
-		<script src="../moduleShim.js"></script>
+		<script src="../moduleShim.js" data-log=""></script>
 		<script src="../compile.js"></script>
 	</head>
 	
@@ -44,18 +47,16 @@
 		<script type="module">(async () => {
 			let compiler = new TypeScript({compiler:'resources/microsoft/TypeScript/release-3.8/lib/typescriptServices.js'});
 			let ts = await compiler.ts;
-			compiler.compile({
+			compiler.compile({options:{
 				target        : ts.ScriptTarget.ES2015,
-				//noEmitOnError : true,
+				noEmitOnError : true,
 				allowJs       : true,
 				checkJs       : true,
-				baseUrl       : '/',
 				alwaysStrict  : true,
-				//strict        : true,
+				strict        : true,
 				module        : ts.ModuleKind.AMD,
-				jsx           : ts.JsxEmit.React,
 				lib           : ['lib.es6.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts']
-			});
+			}});
 		})()</script>
 	</body>
 </html>
