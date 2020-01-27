@@ -1,6 +1,11 @@
 'use strict';
 
-async function runTS(options, version = 'release-3.8', app = 'application') {
+async function runTS({
+	options,
+	version = 'release-3.8',
+	app = 'application',
+	compiler = `https://raw.githubusercontent.com/microsoft/TypeScript/${version}/lib/typescriptServices.js`
+}) {
 	//we have to collect all the code first because the compiler is not async
 	//this lets us do performance measurements on compilation much easier anyway
 	let sourceStrings = new Map();
@@ -22,8 +27,8 @@ async function runTS(options, version = 'release-3.8', app = 'application') {
 	
 		if (type == app)
 			code.remove();
-		if (code.src)
-			fetchCode(code.id, code.src);
+		if (code.hasAttribute('src'))
+			fetchCode(code.id, code.getAttribute('src'));
 		else
 			putCode(code.id, code.text);
 	}
@@ -36,7 +41,7 @@ async function runTS(options, version = 'release-3.8', app = 'application') {
 	transpiler.style.display = 'none';
 	document.body.appendChild(transpiler);
 	let tag = transpiler.contentDocument.createElement('script');
-	tag.text = await (await fetch(`https://raw.githubusercontent.com/microsoft/TypeScript/${version}/lib/typescriptServices.js`)).text();
+	tag.text = await (await fetch(compiler)).text();
 	let timer = performance.now();
 	transpiler.contentDocument.body.appendChild(tag);
 	
